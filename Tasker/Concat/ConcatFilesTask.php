@@ -18,6 +18,22 @@ class ConcatFilesTask implements ITaskService, IRootPathSetter
 	/** @var  string */
 	private $root;
 
+	/** @var IConcatFiles  */
+	private $concatFiles;
+
+	/**
+	 * @param IConcatFiles $concatFiles
+	 */
+	function __construct(IConcatFiles $concatFiles = null)
+	{
+		if($concatFiles === null) {
+			$concatFiles = new ConcatFiles;
+		}
+
+		$this->concatFiles = $concatFiles;
+	}
+
+
 	/**
 	 * @param array $config
 	 * @return array|int|mixed
@@ -32,8 +48,9 @@ class ConcatFilesTask implements ITaskService, IRootPathSetter
 					throw new InvalidStateException('Destination must be valid path');
 				}
 
-				$files = $this->getFileSources($sources);
-				$result = FileSystem::write($dest, $this->getFilesContent($files));
+				$files = $this->concatFiles->getFiles($sources);
+				$content = $this->concatFiles->getFilesContent($files, $this->root);
+				$result = FileSystem::write($this->root . DIRECTORY_SEPARATOR . $dest, $content);
 				if($result === false) {
 					$results[] = 'File "' . $dest . '" cannot be concatenated.';
 				}else{
@@ -43,54 +60,6 @@ class ConcatFilesTask implements ITaskService, IRootPathSetter
 		}
 
 		return $results;
-	}
-
-	/**
-	 * @param array $files
-	 * @return string
-	 */
-	protected function getFilesContent(array $files)
-	{
-		$content = '';
-		if(count($files)) {
-			foreach ($files as $file) {
-				$content .= FileSystem::read($this->root . DIRECTORY_SEPARATOR . $file);
-			}
-		}
-
-		return $content;
-	}
-
-	/**
-	 * @param $sources
-	 * @return array
-	 * @throws \Tasker\InvalidStateException
-	 */
-	protected function getFileSources($sources)
-	{
-		if(is_string($sources)) {
-			$sources = array($sources);
-		}
-
-		if(is_array($sources)) {
-			$files = array();
-			foreach ($sources as $source) {
-				$files = array_merge($files, $this->parsePatter($source));
-			}
-
-			return $files;
-		}
-
-		throw new InvalidStateException('Sources configuration must be array or string.');
-	}
-
-	/**
-	 * @param $pattern
-	 * @return array
-	 */
-	protected function parsePatter($pattern)
-	{
-		return (array) glob((string) $pattern);
 	}
 
 	/**
