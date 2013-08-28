@@ -3,7 +3,7 @@
   "type": "library",
   "description": "Task which will be concatenate your files for task manager Tasker",
   "keywords": ["task", "tasker", "taks runner", "jsifalda", "concat files"],
-  "homepage": "https://github.com/tasker-org/Utils",
+  "homepage": "https://github.com/tasker-org/Tasker-Concat-Files",
   "license": "MIT",
 
   "authors": [
