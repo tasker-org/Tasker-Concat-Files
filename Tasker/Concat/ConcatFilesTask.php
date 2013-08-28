@@ -33,7 +33,12 @@ class ConcatFilesTask implements ITaskService, IRootPathSetter
 				}
 
 				$files = $this->getFileSources($sources);
-				$results = FileSystem::write($dest, $this->getFilesContent($files));
+				$result = FileSystem::write($dest, $this->getFilesContent($files));
+				if($result === false) {
+					$results[] = 'File "' . $dest . '" cannot be concatenated.';
+				}else{
+					$results[] = 'File "' . $dest . '" was concatenated. ' . count($files) . ' files included.';
+				}
 			}
 		}
 
