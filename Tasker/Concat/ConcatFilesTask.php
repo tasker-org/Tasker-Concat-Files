@@ -8,15 +8,11 @@
 namespace Tasker\Concat;
 
 use Tasker\InvalidStateException;
-use Tasker\Setters\IRootPathSetter;
-use Tasker\Tasks\ITaskService;
+use Tasker\Tasks\Task;
 use Tasker\Utils\FileSystem;
 
-class ConcatFilesTask implements ITaskService, IRootPathSetter
+class ConcatFilesTask extends Task
 {
-
-	/** @var  string */
-	private $root;
 
 	/** @var IConcatFiles  */
 	private $concatFiles;
@@ -39,7 +35,7 @@ class ConcatFilesTask implements ITaskService, IRootPathSetter
 	 * @return array|int|mixed
 	 * @throws \Tasker\InvalidStateException
 	 */
-	public function run(array $config)
+	public function run($config)
 	{
 		$results = array();
 		if(count($config)) {
@@ -49,8 +45,8 @@ class ConcatFilesTask implements ITaskService, IRootPathSetter
 				}
 
 				$files = $this->concatFiles->getFiles($sources);
-				$content = $this->concatFiles->getFilesContent($files, $this->root);
-				$result = FileSystem::write($this->root . DIRECTORY_SEPARATOR . $dest, $content);
+				$content = $this->concatFiles->getFilesContent($files, $this->setting->getRootPath());
+				$result = FileSystem::write($this->setting->getRootPath() . DIRECTORY_SEPARATOR . $dest, $content);
 				if($result === false) {
 					$results[] = 'File "' . $dest . '" cannot be concatenated.';
 				}else{
@@ -60,15 +56,5 @@ class ConcatFilesTask implements ITaskService, IRootPathSetter
 		}
 
 		return $results;
-	}
-
-	/**
-	 * @param string $root
-	 * @return $this
-	 */
-	public function setRootPath($root)
-	{
-		$this->root = (string) $root;
-		return $this;
 	}
 }
