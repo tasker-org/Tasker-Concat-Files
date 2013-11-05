@@ -51,7 +51,7 @@ class ConcatFiles
 			$sources = array($sources);
 		}
 
-		if(is_array($sources)) {
+		if(count($sources)) {
 			$files = array();
 			foreach ($sources as $source) {
 				$files = array_merge($files, $this->parsePattern($source));
@@ -59,8 +59,6 @@ class ConcatFiles
 
 			return $files;
 		}
-
-		throw new InvalidStateException('Sources configuration must be array or string.');
 	}
 
 	/**
